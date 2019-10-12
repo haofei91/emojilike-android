@@ -3,7 +3,7 @@ package ro.andreidobrescu.sample.fragments;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentManager;
 
-import ro.andreidobrescu.emojilike.ActivityWithEmoji;
+import ro.andreidobrescu.emojilike.touchdetector.ActivityWithEmoji;
 import ro.andreidobrescu.sample.R;
 
 /**

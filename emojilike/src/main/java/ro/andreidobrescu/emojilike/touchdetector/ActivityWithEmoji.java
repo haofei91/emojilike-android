@@ -1,8 +1,12 @@
-package ro.andreidobrescu.emojilike;
+package ro.andreidobrescu.emojilike.touchdetector;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.MotionEvent;
+
+import ro.andreidobrescu.emojilike.EmojiConfig;
+import ro.andreidobrescu.emojilike.touchdetector.EmojiLikeTouchDetector;
+import ro.andreidobrescu.emojilike.touchdetector.IActivityWithEmoji;
 
 /**
  * Created by using on 7/4/2016.

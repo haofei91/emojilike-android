@@ -10,13 +10,13 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import ro.andreidobrescu.emojilike.Emoji;
-import ro.andreidobrescu.emojilike.EmojiCellView;
+import ro.andreidobrescu.emojilike.entity.EmojiEntity;
+import ro.andreidobrescu.emojilike.view.EmojiCellView;
 import ro.andreidobrescu.emojilike.EmojiConfig;
-import ro.andreidobrescu.emojilike.EmojiLikeTouchDetector;
+import ro.andreidobrescu.emojilike.touchdetector.EmojiLikeTouchDetector;
 import ro.andreidobrescu.emojilike.EmojiLikeView;
-import ro.andreidobrescu.emojilike.IActivityWithEmoji;
-import ro.andreidobrescu.emojilike.OnEmojiSelectedListener;
+import ro.andreidobrescu.emojilike.touchdetector.IActivityWithEmoji;
+import ro.andreidobrescu.emojilike.listener.OnEmojiSelectedListener;
 import ro.andreidobrescu.sample.fragments.FragmentActivitySample;
 import ro.andreidobrescu.sample.recycler.RecyclerActivitySample;
 
@@ -44,11 +44,11 @@ public class MainActivity extends AppCompatActivity implements OnEmojiSelectedLi
         EmojiConfig.with(this)
                 .on(likeButton)
                 .open(emojiView)
-                .addEmoji(new Emoji(R.drawable.like, "Like"))
-                .addEmoji(new Emoji(R.drawable.haha, "Haha"))
-                .addEmoji(new Emoji(R.drawable.kiss, "Kiss"))
-                .addEmoji(new Emoji(R.drawable.sad, "Sad"))
-                .addEmoji(new Emoji(R.drawable.p, ":P"))
+                .addEmoji(new EmojiEntity(R.drawable.like, "Like"))
+                .addEmoji(new EmojiEntity(R.drawable.haha, "Haha"))
+                .addEmoji(new EmojiEntity(R.drawable.kiss, "Kiss"))
+                .addEmoji(new EmojiEntity(R.drawable.sad, "Sad"))
+                .addEmoji(new EmojiEntity(R.drawable.p, ":P"))
                 .setEmojiAnimationSpeed(0.2f)
                 .setEmojiCellViewFactory(EmojiCellView.WithImageAndText::new)
                 .setOnEmojiSelectedListener(this)
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnEmojiSelectedLi
     }
 
     @Override
-    public void onEmojiSelected(Emoji emoji)
+    public void onEmojiSelected(EmojiEntity emoji)
     {
         Toast.makeText(this, "Selected "+emoji.getDescription(), Toast.LENGTH_SHORT).show();
     }

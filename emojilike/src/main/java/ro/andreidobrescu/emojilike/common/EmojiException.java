@@ -1,4 +1,4 @@
-package ro.andreidobrescu.emojilike;
+package ro.andreidobrescu.emojilike.common;
 
 /**
  * Created by using on 7/4/2016.

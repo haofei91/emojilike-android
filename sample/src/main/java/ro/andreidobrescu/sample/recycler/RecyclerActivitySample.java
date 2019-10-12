@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ro.andreidobrescu.emojilike.ActivityWithEmoji;
+import ro.andreidobrescu.emojilike.touchdetector.ActivityWithEmoji;
 import ro.andreidobrescu.sample.R;
 
 /**

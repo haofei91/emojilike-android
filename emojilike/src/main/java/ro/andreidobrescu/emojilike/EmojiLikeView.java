@@ -13,20 +13,32 @@ import android.widget.RelativeLayout;
 import java.util.LinkedList;
 import java.util.List;
 
+import ro.andreidobrescu.emojilike.entity.EmojiEntity;
+import ro.andreidobrescu.emojilike.view.EmojiCellView;
+import ro.andreidobrescu.emojilike.view.animation.ViewWeightAnimation;
+
 /**
  * Created by using on 7/4/2016.
  */
 public class EmojiLikeView extends RelativeLayout
 {
-    private ImageView emojiBackgroundView;
-
-    private LinearLayout emojiCellsContainer;
-
-    private List<EmojiCellView> emojiCellViews;
-
-    private int selectedEmoji=0;
-
+    /**
+     * 传入参数
+     */
     private EmojiConfig config;
+
+    /**
+     * View
+     */
+    private ImageView emojiBackgroundView;//背景
+    private LinearLayout emojiCellsContainer;//线性布局容器，承放表情Item
+    private List<EmojiCellView> emojiCellViews;//缓存表情Item
+    /**
+     * 中间变量
+     */
+    private int selectedEmoji=0;//当前选中位置
+
+    /*****************  构造函数 *********************/
 
     public EmojiLikeView(Context context)
     {
@@ -46,13 +58,18 @@ public class EmojiLikeView extends RelativeLayout
         this.setBackgroundColor(Color.TRANSPARENT);
     }
 
-    //used for the initial setup
+    /*****************  初始化 *********************/
+
+    /**
+     * 构建itemViews
+     */
     public void configure (EmojiConfig config)
     {
         this.config=config;
         this.emojiCellViews =new LinkedList<>();
         this.selectedEmoji=-1;
 
+        //1. 背景
         if (config.backgroundImageResource !=0)
         {
             //creating the background image view
@@ -70,7 +87,7 @@ public class EmojiLikeView extends RelativeLayout
             this.addView(emojiBackgroundView);
         }
 
-        //creating the container for emoji imageviews
+        //2. 表情容器
         this.emojiCellsContainer=new LinearLayout(getContext());
         RelativeLayout.LayoutParams params=new LayoutParams(LayoutParams.MATCH_PARENT, config.emojiImagesContainerHeight);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -78,10 +95,11 @@ public class EmojiLikeView extends RelativeLayout
         this.emojiCellsContainer.setVisibility(View.INVISIBLE);
         this.addView(emojiCellsContainer);
 
+        //3. 表情items
         for (int i=0; i<config.emojis.size(); i++)
         {
             //creating emoji cell views
-            Emoji emoji=config.emojis.get(i);
+            EmojiEntity emoji=config.emojis.get(i);
 
             EmojiCellView cellView=config.cellViewFactory.newInstance(getContext());
             cellView.setLayoutParams(getDefaultLayoutParams(i));
@@ -95,7 +113,7 @@ public class EmojiLikeView extends RelativeLayout
         this.bringToFront();
     }
 
-    //default layoutparams for an emoji imageview
+    //表情item的默认布局
     private LinearLayout.LayoutParams getDefaultLayoutParams (int viewIndex)
     {
         int height=LinearLayout.LayoutParams.MATCH_PARENT;
@@ -115,10 +133,16 @@ public class EmojiLikeView extends RelativeLayout
         return params;
     }
 
-    //used to show contents the view
+
+    /*****************  动作 *********************/
+
+    /**
+     * used to show contents the view
+     */
     public void show()
     {
-        if (this.emojiCellsContainer.getVisibility() == View.VISIBLE) return;
+        if (this.emojiCellsContainer.getVisibility() == View.VISIBLE)
+            return;
 
         if (config.emojiViewOpenedAnimation !=null)
             this.startAnimation(config.emojiViewOpenedAnimation);
@@ -129,13 +153,14 @@ public class EmojiLikeView extends RelativeLayout
         this.emojiCellsContainer.setVisibility(View.VISIBLE);
     }
 
-    //used to hide contents of the view
+    /**
+     * used to hide contents of the view
+     */
     public void hide()
     {
         if (this.emojiCellsContainer.getVisibility() != View.VISIBLE) return;
 
-        if (config.emojiViewClosedAnimation !=null)
-        {
+        if (config.emojiViewClosedAnimation !=null) {
             this.startAnimation(config.emojiViewClosedAnimation);
 
             config.emojiViewClosedAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -150,8 +175,7 @@ public class EmojiLikeView extends RelativeLayout
                         emojiBackgroundView.setVisibility(View.INVISIBLE);
                     emojiCellsContainer.setVisibility(View.INVISIBLE);
 
-                    for (int i = 0; i< emojiCellViews.size(); i++)
-                    {
+                    for (int i = 0; i< emojiCellViews.size(); i++) {
                         EmojiCellView cellView=emojiCellViews.get(i);
                         cellView.setLayoutParams(getDefaultLayoutParams(i));
                         cellView.onWeightAnimated(0);
@@ -163,65 +187,19 @@ public class EmojiLikeView extends RelativeLayout
 
                 }
             });
-        }
-        else
-        {
+        } else {
             if (this.emojiBackgroundView!=null)
                 this.emojiBackgroundView.setVisibility(View.INVISIBLE);
             this.emojiCellsContainer.setVisibility(View.INVISIBLE);
         }
     }
 
-    public void onTouchUp (float x, float y)
-    {
-        if (this.isShowed())
-        {
-            if (config.onEmojiSelectedListener!=null)
-            {
-                if (selectedEmoji >=0&& selectedEmoji <this.config.emojis.size())
-                {
-                    if (x!=-1&&y!=-1)
-                    {
-                        if (selectedEmoji!=-1)
-                        {
-                            config.onEmojiSelectedListener.onEmojiSelected(this.config.emojis.get(selectedEmoji));
-                        }
-                    }
-                }
-            }
-        }
-    }
+    /****************************** 对界面触摸时间的响应 *************************/
 
-    public void onTouchMove (float x, float y)
-    {
-        int maxX=getWidth();
-        int minX=(int)getX();
-        int index=(int)(((x-minX)/(float)maxX)*config.emojis.size());
-
-        if (x<minX||x>maxX+minX)
-        {
-            //out of the emoji zone
-            for (int i=0; i<config.emojis.size(); i++)
-                setUnselectedEmoji(i);
-            selectedEmoji=-1;
-        }
-        else
-        {
-            if (index<0) index=0;
-            if (index>=config.emojis.size()) index=config.emojis.size()-1;
-            setSelectedLikeOnIndex(index);
-        }
-    }
-
-    private void setSelectedLikeOnIndex(int selectedIndex)
-    {
-        for (int i=0; i<selectedIndex; i++)
-            setUnselectedEmoji(i);
-        for (int i=selectedIndex+1; i<config.emojis.size(); i++)
-            setUnselectedEmoji(i);
-        setSelectedEmoji(selectedIndex);
-    }
-
+    /**
+     * 响应点下事件
+     * 1. 调用onTouchMove。放大选中的表情
+     */
     public void onTouchDown (final float x, final float y)
     {
         onTouchMove(x, y);
@@ -234,10 +212,64 @@ public class EmojiLikeView extends RelativeLayout
         }, 50);
     }
 
-    private void setSelectedEmoji(int index)
+    /**
+     * 响应抬起事件，触发选中回掉。  ps: 表情Views的布局复位在hide中进行
+     */
+    public void onTouchUp (float x, float y)
     {
-        if (index>=0&&index< emojiCellViews.size())
-        {
+        if (this.isShowed()) {
+            if (config.onEmojiSelectedListener!=null) {
+                if (selectedEmoji >=0&& selectedEmoji <this.config.emojis.size()) {
+                    if (x!=-1&&y!=-1) {
+                        if (selectedEmoji!=-1) {
+                            config.onEmojiSelectedListener.onEmojiSelected(this.config.emojis.get(selectedEmoji));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 响应Move事件。放大选中布局
+     */
+    public void onTouchMove (float x, float y)
+    {
+        int maxX=getWidth();
+        int minX=(int)getX();
+        int index=(int)(((x-minX)/(float)maxX)*config.emojis.size());
+
+        if (x<minX||x>maxX+minX) {
+            //out of the emoji zone
+            for (int i=0; i<config.emojis.size(); i++)
+                setUnselectedEmoji(i);
+            selectedEmoji=-1;
+        } else {
+            if (index<0) index=0;
+            if (index>=config.emojis.size()) {
+                //超过就是最后一个
+                index=config.emojis.size()-1;
+            }
+            setSelectedLikeOnIndex(index);
+        }
+    }
+
+
+    /**
+     * 放大指定位置的表情
+     */
+    private void setSelectedLikeOnIndex(int selectedIndex) {
+
+        for (int i=0; i<selectedIndex; i++)
+            setUnselectedEmoji(i);
+        for (int i=selectedIndex+1; i<config.emojis.size(); i++)
+            setUnselectedEmoji(i);
+
+        setSelectedEmoji(selectedIndex);
+    }
+
+    private void setSelectedEmoji(int index) {
+        if (index>=0&&index< emojiCellViews.size()) {
             selectedEmoji=index;
             EmojiCellView view= emojiCellViews.get(selectedEmoji);
             float weight=getWeight (view);
@@ -245,6 +277,15 @@ public class EmojiLikeView extends RelativeLayout
         }
     }
 
+
+    private void growView (EmojiCellView view, int index, float initWeight, float maxWeight, float step, boolean shouldSelect) {
+        Animation a=new ViewWeightAnimation(view, index, initWeight, maxWeight, step, shouldSelect, config);
+        view.startAnimation(a);
+    }
+
+    /**
+     * 缩小指定View
+     */
     private void setUnselectedEmoji(int index)
     {
         if (index>=0&&index< emojiCellViews.size())
@@ -255,21 +296,19 @@ public class EmojiLikeView extends RelativeLayout
         }
     }
 
-    private void growView (EmojiCellView view, int index, float initWeight, float maxWeight, float step, boolean shouldSelect)
-    {
-        Animation a=new ViewWeightAnimation(view, index, initWeight, maxWeight, step, shouldSelect, config);
-        view.startAnimation(a);
-    }
-
-    private void shrinkView (EmojiCellView view, int index, float initWeight, float maxWeight, float step, boolean forSelected)
-    {
+    private void shrinkView (EmojiCellView view, int index, float initWeight, float maxWeight, float step, boolean forSelected) {
         growView(view, index, initWeight, maxWeight, step, forSelected);
     }
+
+
 
     public float getWeight (View view)
     {
         return ((LinearLayout.LayoutParams)view.getLayoutParams()).weight;
     }
+
+
+    /********************* get|set ***********************/
 
     public boolean isShowed ()
     {

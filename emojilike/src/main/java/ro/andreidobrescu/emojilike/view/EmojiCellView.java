@@ -1,4 +1,4 @@
-package ro.andreidobrescu.emojilike;
+package ro.andreidobrescu.emojilike.view;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -10,8 +10,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import ro.andreidobrescu.emojilike.entity.EmojiEntity;
 import ro.andreidobrescu.emojilikelib.R;
 
+/**
+ * 单个表情
+ */
 public abstract class EmojiCellView extends FrameLayout
 {
     public EmojiCellView(@NonNull Context context)
@@ -22,9 +26,26 @@ public abstract class EmojiCellView extends FrameLayout
         inflater.inflate(getLayoutId(), this, true);
     }
 
+    /**
+     * 布局xml
+     */
     public abstract int getLayoutId();
-    public abstract void setEmoji(Emoji emoji);
+
+    /**
+     * 绑定表情，，在构建View时会调用和传入对应值
+     */
+    public abstract void setEmoji(EmojiEntity emoji);
+
+    /**
+     *
+     * @param animationPercent
+     */
     public void onWeightAnimated(float animationPercent) {}
+
+
+
+
+    /********************** 纯图片类型  ***************************/
 
     public static class WithImage extends EmojiCellView
     {
@@ -40,12 +61,15 @@ public abstract class EmojiCellView extends FrameLayout
         }
 
         @Override
-        public void setEmoji(Emoji emoji)
+        public void setEmoji(EmojiEntity emoji)
         {
             ImageView imageView=findViewById(R.id.imageView);
             imageView.setImageResource(emoji.getDrawable());
         }
     }
+
+    /********************** 图文类型类型  ***************************/
+
 
     public static class WithImageAndText extends EmojiCellView
     {
@@ -61,7 +85,7 @@ public abstract class EmojiCellView extends FrameLayout
         }
 
         @Override
-        public void setEmoji(Emoji emoji)
+        public void setEmoji(EmojiEntity emoji)
         {
             ImageView imageView=findViewById(R.id.imageView);
             TextView descriptionLabel=findViewById(R.id.descriptionLabel);

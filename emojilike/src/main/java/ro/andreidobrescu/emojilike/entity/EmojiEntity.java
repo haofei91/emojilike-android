@@ -1,10 +1,10 @@
-package ro.andreidobrescu.emojilike;
+package ro.andreidobrescu.emojilike.entity;
 
 /**
  * Created by using on 7/4/2016.
  * emoji model class
  */
-public class Emoji
+public class EmojiEntity
 {
     private int drawable;
 
@@ -12,12 +12,12 @@ public class Emoji
 
     private Object tag;
 
-    public Emoji(int drawable, String description) {
+    public EmojiEntity(int drawable, String description) {
         this.drawable = drawable;
         this.description = description;
     }
 
-    public Emoji(int drawable, String description, Object tag) {
+    public EmojiEntity(int drawable, String description, Object tag) {
         this.drawable = drawable;
         this.description = description;
         this.tag = tag;

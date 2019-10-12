@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ro.andreidobrescu.emojilike.Emoji;
+import ro.andreidobrescu.emojilike.entity.EmojiEntity;
 import ro.andreidobrescu.emojilike.EmojiConfig;
 import ro.andreidobrescu.emojilike.EmojiLikeView;
 import ro.andreidobrescu.sample.R;
@@ -44,11 +44,11 @@ public class FragmentSample extends Fragment
         EmojiConfig.with(getContext())
                 .on(likeButton)
                 .open(emojiView)
-                .addEmoji(new Emoji(R.drawable.like, "Like"))
-                .addEmoji(new Emoji(R.drawable.haha, "Haha"))
-                .addEmoji(new Emoji(R.drawable.kiss, "Kiss"))
-                .addEmoji(new Emoji(R.drawable.sad, "Sad"))
-                .addEmoji(new Emoji(R.drawable.p, ":P"))
+                .addEmoji(new EmojiEntity(R.drawable.like, "Like"))
+                .addEmoji(new EmojiEntity(R.drawable.haha, "Haha"))
+                .addEmoji(new EmojiEntity(R.drawable.kiss, "Kiss"))
+                .addEmoji(new EmojiEntity(R.drawable.sad, "Sad"))
+                .addEmoji(new EmojiEntity(R.drawable.p, ":P"))
                 .setOnEmojiSelectedListener(emoji ->
                 {
                     Toast.makeText(getContext(), "Selected center " + emoji.getDescription(), Toast.LENGTH_SHORT).show();
@@ -58,12 +58,12 @@ public class FragmentSample extends Fragment
         EmojiConfig.with(getContext())
                 .on(likeButton2)
                 .open(emojiView2)
-                .addEmoji(new Emoji(R.drawable.like, "Like"))
-                .addEmoji(new Emoji(R.drawable.haha, "Haha"))
-                .addEmoji(new Emoji(R.drawable.sad, "Sad"))
-                .addEmoji(new Emoji(R.drawable.sad, "Sad"))
-                .addEmoji(new Emoji(R.drawable.sad, "Sad"))
-                .addEmoji(new Emoji(R.drawable.p, ":P"))
+                .addEmoji(new EmojiEntity(R.drawable.like, "Like"))
+                .addEmoji(new EmojiEntity(R.drawable.haha, "Haha"))
+                .addEmoji(new EmojiEntity(R.drawable.sad, "Sad"))
+                .addEmoji(new EmojiEntity(R.drawable.sad, "Sad"))
+                .addEmoji(new EmojiEntity(R.drawable.sad, "Sad"))
+                .addEmoji(new EmojiEntity(R.drawable.p, ":P"))
                 .setOnEmojiSelectedListener(emoji ->
                 {
                     Toast.makeText(getContext(), "Selected bottom " + emoji.getDescription(), Toast.LENGTH_SHORT).show();

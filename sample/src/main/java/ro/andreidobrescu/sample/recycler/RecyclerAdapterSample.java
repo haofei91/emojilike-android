@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import ro.andreidobrescu.emojilike.Emoji;
+import ro.andreidobrescu.emojilike.entity.EmojiEntity;
 import ro.andreidobrescu.emojilike.EmojiConfig;
 import ro.andreidobrescu.emojilike.EmojiLikeView;
 import ro.andreidobrescu.sample.R;
@@ -52,11 +52,11 @@ public class RecyclerAdapterSample extends RecyclerView.Adapter <RecyclerAdapter
         EmojiConfig.with(getContext())
                 .on(holder.likeButton)
                 .open(holder.emojiView)
-                .addEmoji(new Emoji(R.drawable.like, "Like", position))
-                .addEmoji(new Emoji(R.drawable.haha, "Haha", position))
-                .addEmoji(new Emoji(R.drawable.kiss, "Kiss", position))
-                .addEmoji(new Emoji(R.drawable.sad, "Sad", position))
-                .addEmoji(new Emoji(R.drawable.p, ":P", position))
+                .addEmoji(new EmojiEntity(R.drawable.like, "Like", position))
+                .addEmoji(new EmojiEntity(R.drawable.haha, "Haha", position))
+                .addEmoji(new EmojiEntity(R.drawable.kiss, "Kiss", position))
+                .addEmoji(new EmojiEntity(R.drawable.sad, "Sad", position))
+                .addEmoji(new EmojiEntity(R.drawable.p, ":P", position))
                 .setOnEmojiSelectedListener(emoji ->
                 {
                     Toast.makeText(getContext(), emoji.getDescription()+" "+emoji.getTag().toString(), Toast.LENGTH_SHORT).show();
