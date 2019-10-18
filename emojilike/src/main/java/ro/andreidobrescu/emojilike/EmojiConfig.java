@@ -1,5 +1,6 @@
 package ro.andreidobrescu.emojilike;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.TypedValue;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import ro.andreidobrescu.emojilike.listener.OnEmojiSelectedListener;
 import ro.andreidobrescu.emojilike.touchdetector.ActivityWithEmoji;
 import ro.andreidobrescu.emojilike.touchdetector.IActivityWithEmoji;
 import ro.andreidobrescu.emojilike.view.EmojiCellView;
+import ro.andreidobrescu.emojilike.view.EmojiLikePopup;
 import ro.andreidobrescu.emojilike.view.factory.IEmojiCellViewFactory;
 import ro.andreidobrescu.emojilikelib.R;
 
@@ -35,6 +38,7 @@ public class EmojiConfig
      */
     public View triggerView;
     public EmojiLikeView emojiView;
+    public EmojiLikePopup emojiLikePopup;
 
     /**
      * 浮层的延时控制 和动画
@@ -139,6 +143,11 @@ public class EmojiConfig
 
     public void setup ()
     {
+        if (emojiView==null){
+            emojiLikePopup = new EmojiLikePopup(new WeakReference<Activity>(getActivity ()));
+            emojiView = emojiLikePopup.emojiLikeView;
+        }
+
         if (target==null)
             throw new EmojiException("Target not set. Set it with EmojiConfig.with(target)");
         else if (triggerView==null)
@@ -157,11 +166,6 @@ public class EmojiConfig
         }
     }
 
-    public EmojiConfig open (EmojiLikeView emojiView)
-    {
-        this.emojiView=emojiView;
-        return this;
-    }
 
 
 
@@ -188,6 +192,13 @@ public class EmojiConfig
         return null;
     }
 
+    private Activity getActivity ()
+    {
+        if (target instanceof Activity)
+            return (Activity)target;
+        return null;
+    }
+
     /**
      * 控件
      */
@@ -196,6 +207,13 @@ public class EmojiConfig
         this.triggerView=triggerView;
         return this;
     }
+
+    public EmojiConfig open (EmojiLikeView emojiView)
+    {
+        this.emojiView=emojiView;
+        return this;
+    }
+
 
     /**
      * 浮层的延时控制 和动画

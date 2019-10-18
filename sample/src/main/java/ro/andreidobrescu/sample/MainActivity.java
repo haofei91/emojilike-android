@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnEmojiSelectedLi
 
         EmojiConfig.with(this)
                 .on(likeButton)
-                .open(emojiView)
+                //.open(emojiView)
                 .addEmoji(new EmojiEntity(R.drawable.like, "Like"))
                 .addEmoji(new EmojiEntity(R.drawable.haha, "Haha"))
                 .addEmoji(new EmojiEntity(R.drawable.kiss, "Kiss"))
