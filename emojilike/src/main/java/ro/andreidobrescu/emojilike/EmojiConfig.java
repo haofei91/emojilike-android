@@ -146,6 +146,13 @@ public class EmojiConfig
         if (emojiView==null){
             emojiLikePopup = new EmojiLikePopup(new WeakReference<Activity>(getActivity ()));
             emojiView = emojiLikePopup.emojiLikeView;
+            triggerView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    emojiView.show();
+                }
+            });
+            emojiLikePopup.configure(this);
         }
 
         if (target==null)
@@ -160,7 +167,7 @@ public class EmojiConfig
             throw new EmojiException("EmojiLikeView not set. Use open method.");
         else {
             //[事件]构建EmojiConfig.setUp时，会将构建好的Config传入detector---->内部构建EmojiTriggerManager加入缓存,所有的界面容器事件会转给emojiTriggerManagers
-            target.configureEmojiLike(this);
+            //target.configureEmojiLike(this);
             //[视图]构建itemViews
             emojiView.configure(this);
         }

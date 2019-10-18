@@ -28,9 +28,9 @@ public class EmojiTriggerManager {
     /**
      * 中间变量
      */
-    private boolean triggerViewTouched = false;//标示是否在一次触发延时弹窗事件中
+    public boolean triggerViewTouched = false;//标示是否在一次触发延时弹窗事件中
 
-    private boolean shouldSendEventsToEmojiView = false;//延时任务是否已经被触发 == View已经显示
+    public boolean shouldSendEventsToEmojiView = false;//延时任务是否已经被触发 == View已经显示
     private boolean shouldWaitForClosing = false;//标示是否在延时关闭弹窗中，是的话就终止其他事件响应
 
     private MotionEvent downEvent;//缓存 引发触摸控件的触摸事件的  DownEvent，延时任务被执行时传递给View
