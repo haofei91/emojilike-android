@@ -25,12 +25,10 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  * Created by mathilde on 2018/4/26.
  */
 
-public class EmojiLikePopup extends BasePopup implements View.OnTouchListener {
+public class EmojiLikePopup extends BasePopup {
 
     public View rootView;
     public EmojiLikeView emojiLikeView;
-    public EmojiConfig config;
-    EmojiTriggerManager emojiTriggerManager;
 
     public EmojiLikePopup(@NonNull WeakReference<Activity> reference){
         super(reference);
@@ -38,20 +36,9 @@ public class EmojiLikePopup extends BasePopup implements View.OnTouchListener {
         initView();
     }
 
-    public void configure(EmojiConfig config) {
-        this.config = config;
-
-        emojiTriggerManager=new EmojiTriggerManager();
-        emojiTriggerManager.configure(config);
-
-        emojiTriggerManager.triggerViewTouched = true;
-        emojiTriggerManager.shouldSendEventsToEmojiView = true;
-    }
-
     private void initView() {
         rootView = LayoutInflater.from(activity).inflate(R.layout.emoji_like_popup_layout, null, true);
         emojiLikeView = rootView.findViewById(R.id.emojiView);
-        emojiLikeView.setOnTouchListener(this);
         setOnDismissListener(new OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -66,18 +53,13 @@ public class EmojiLikePopup extends BasePopup implements View.OnTouchListener {
         setHeight(WRAP_CONTENT);
     }
 
-    public void show(View view, int y) {
-        super.showAtLocation(view, Gravity.TOP|Gravity.RIGHT, 0, y);
+
+
+    public void showAtLocation(View view, int x, int y) {
+        super.showAtLocation(view, Gravity.TOP|Gravity.RIGHT, x, y);
 
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            return true;
-        }
-
-        return !emojiTriggerManager.onTouch(event);
+    public void configure(EmojiConfig emojiConfig) {
     }
 }

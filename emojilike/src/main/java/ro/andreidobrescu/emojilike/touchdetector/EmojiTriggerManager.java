@@ -106,7 +106,7 @@ public class EmojiTriggerManager {
     /**
      * 校验触摸事件，是否在 触发View的布局范围内
      */
-    private boolean intersectView(View view, int rx, int ry) {
+    public static boolean intersectView(View view, int rx, int ry) {
         int[] l = new int[2];
         view.getLocationOnScreen(l);
         int x = l[0];

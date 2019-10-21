@@ -16,7 +16,7 @@ import ro.andreidobrescu.emojilikelib.R;
 /**
  * 单个表情
  */
-public abstract class EmojiCellView extends FrameLayout
+public abstract class EmojiCellView extends LinearLayout
 {
     public EmojiCellView(@NonNull Context context)
     {
@@ -98,13 +98,15 @@ public abstract class EmojiCellView extends FrameLayout
         public void onWeightAnimated(float animationPercent)
         {
             TextView descriptionLabel=findViewById(R.id.descriptionLabel);
+            descriptionLabel.setVisibility(GONE);
+            /*TextView descriptionLabel=findViewById(R.id.descriptionLabel);
             descriptionLabel.setAlpha(animationPercent);
 
             LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                     (int)(animationPercent*getResources().getDimensionPixelSize(R.dimen.default_emoji_description_label_height)));
             params.bottomMargin=getResources().getDimensionPixelSize(R.dimen.default_emoji_description_label_bottom_margin);
             params.gravity=Gravity.CENTER_HORIZONTAL;
-            descriptionLabel.setLayoutParams(params);
+            descriptionLabel.setLayoutParams(params);*/
         }
     }
 }

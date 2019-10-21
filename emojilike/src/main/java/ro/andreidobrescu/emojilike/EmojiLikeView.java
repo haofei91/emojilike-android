@@ -1,9 +1,14 @@
 package ro.andreidobrescu.emojilike;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
-import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -14,13 +19,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ro.andreidobrescu.emojilike.entity.EmojiEntity;
+import ro.andreidobrescu.emojilike.touchdetector.EmojiTriggerManager;
 import ro.andreidobrescu.emojilike.view.EmojiCellView;
 import ro.andreidobrescu.emojilike.view.animation.ViewWeightAnimation;
+import ro.andreidobrescu.emojilikelib.R;
 
 /**
  * Created by using on 7/4/2016.
  */
-public class EmojiLikeView extends RelativeLayout {
+public class EmojiLikeView extends RelativeLayout implements View.OnTouchListener {
     /**
      * 传入参数
      */
@@ -40,26 +47,62 @@ public class EmojiLikeView extends RelativeLayout {
     /*****************  构造函数 *********************/
 
     public EmojiLikeView(Context context) {
-        super(context);
-        this.setBackgroundColor(Color.TRANSPARENT);
+        this(context, null);
     }
 
     public EmojiLikeView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        this.setBackgroundColor(Color.TRANSPARENT);
+        this(context, attrs, 0);
     }
 
     public EmojiLikeView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.setBackgroundColor(Color.TRANSPARENT);
+        initView();
     }
 
+    private void initView() {
+        LayoutInflater.from(getContext()).inflate(R.layout.emoji_like_view_layout, this, true);
+
+    }
     /*****************  初始化 *********************/
 
+    public void configure(EmojiConfig config) {
+        this.config = config;
+        this.emojiCellViews = new LinkedList<>();
+        this.selectedEmoji = -1;
+
+        emojiCellsContainer = findViewById(R.id.emoji_container);
+
+        //3. 表情items
+        for (int i = 0; i < config.emojis.size(); i++) {
+            //creating emoji cell views
+            EmojiEntity emoji = config.emojis.get(i);
+
+            EmojiCellView cellView = config.cellViewFactory.newInstance(getContext());
+            cellView.setLayoutParams(getDefaultLayoutParams(i));
+            cellView.onWeightAnimated(0);
+            cellView.setEmoji(emoji);
+            cellView.setTag(emoji);
+
+            cellView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(v instanceof EmojiCellView){
+                        config.onEmojiSelectedListener.onEmojiSelected((EmojiEntity)v.getTag());
+                    }
+                }
+            });
+
+            this.emojiCellsContainer.addView(cellView);
+            this.emojiCellViews.add(cellView);
+        }
+
+        setOnTouchListener(this);
+    }
     /**
      * 构建itemViews
      */
-    public void configure(EmojiConfig config) {
+    public void configure1(EmojiConfig config) {
         this.config = config;
         this.emojiCellViews = new LinkedList<>();
         this.selectedEmoji = -1;
@@ -74,19 +117,20 @@ public class EmojiLikeView extends RelativeLayout {
 
             RelativeLayout.LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, config.backgroundViewHeight);
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-            params.setMargins(config.emojiViewMarginLeft, 0, config.emojiViewMarginRight, config.backgroundViewMarginBottom);
+            //params.setMargins(config.backgroundViewMarginLeft, 0, config.backgroundViewMarginRight, config.backgroundViewMarginBottom);
             emojiBackgroundView.setLayoutParams(params);
 
-            emojiBackgroundView.setVisibility(View.INVISIBLE);
+            emojiBackgroundView.setVisibility(View.VISIBLE);
             this.addView(emojiBackgroundView);
         }
 
         //2. 表情容器
         this.emojiCellsContainer = new LinearLayout(getContext());
         RelativeLayout.LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, config.emojiImagesContainerHeight);
+        //params.setMargins(config.backgroundViewMarginLeft, 0, config.backgroundViewMarginRight, config.backgroundViewMarginBottom);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         this.emojiCellsContainer.setLayoutParams(params);
-        this.emojiCellsContainer.setVisibility(View.INVISIBLE);
+        this.emojiCellsContainer.setVisibility(View.VISIBLE);
         this.addView(emojiCellsContainer);
 
         //3. 表情items
@@ -98,10 +142,22 @@ public class EmojiLikeView extends RelativeLayout {
             cellView.setLayoutParams(getDefaultLayoutParams(i));
             cellView.onWeightAnimated(0);
             cellView.setEmoji(emoji);
+            cellView.setTag(emoji);
+
+            cellView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(v instanceof EmojiCellView){
+                        config.onEmojiSelectedListener.onEmojiSelected((EmojiEntity)v.getTag());
+                    }
+                }
+            });
 
             this.emojiCellsContainer.addView(cellView);
             this.emojiCellViews.add(cellView);
         }
+
+        setOnTouchListener(this);
 
         this.bringToFront();
     }
@@ -109,19 +165,18 @@ public class EmojiLikeView extends RelativeLayout {
     //表情item的默认布局
     private LinearLayout.LayoutParams getDefaultLayoutParams(int viewIndex) {
         int height = LinearLayout.LayoutParams.MATCH_PARENT;
-        float weight = config.unselectedEmojiWeight;
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, height, weight);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         int left = config.unselectedEmojiMarginLeft;
         int top = config.unselectedEmojiMarginTop;
         int bottom = config.unselectedEmojiMarginBottom;
-        int right = config.unselectedEmojiMarginRight;
         if (viewIndex == 0)
-            params.setMargins(config.emojiViewMarginLeft + left, top, right, bottom);
+            params.setMargins(config.emojiImagesContainerPaddingLeft, 0, left, bottom);
         else if (viewIndex == config.emojis.size() - 1)
-            params.setMargins(left, top, right + config.emojiViewMarginRight, bottom);
+            params.setMargins(0, 0, config.emojiImagesContainerPaddingRight, bottom);
         else
-            params.setMargins(left, top, right, bottom);
+            params.setMargins(0, 0, left, bottom);
+
         return params;
     }
 
@@ -141,10 +196,6 @@ public class EmojiLikeView extends RelativeLayout {
             this.emojiBackgroundView.setVisibility(View.VISIBLE);
 
         this.emojiCellsContainer.setVisibility(View.VISIBLE);
-
-        if (this.config.emojiLikePopup != null) {
-            this.config.emojiLikePopup.showAsDropDown(this.config.triggerView);
-        }
     }
 
     /**
@@ -197,6 +248,27 @@ public class EmojiLikeView extends RelativeLayout {
 
     /****************************** 对界面触摸时间的响应 *************************/
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        float x = event.getRawX();
+        float y = event.getRawY();
+        int action = event.getAction();
+
+        if (action == MotionEvent.ACTION_DOWN) {
+            onTouchDown(x, y);
+            return true;
+        }else if (action == MotionEvent.ACTION_MOVE) {
+            onTouchMove(x, y);
+            return true;
+        }else if (action == MotionEvent.ACTION_UP) {
+            onTouchUp(x, y);
+            return true;
+        }
+
+        return false;
+    }
+
+
     /**
      * 响应点下事件
      * 1. 调用onTouchMove。放大选中的表情
@@ -233,11 +305,14 @@ public class EmojiLikeView extends RelativeLayout {
      * 响应Move事件。放大选中布局
      */
     public void onTouchMove(float x, float y) {
+        int maxY = getHeight();
+        int minY = (int)getY();
         int maxX = getWidth();
         int minX = (int) getX();
         int index = (int) (((x - minX) / (float) maxX) * config.emojis.size());
 
-        if (x < minX || x > maxX + minX) {
+        //if (x < minX || x > maxX + minX || y<minY || minY > minY+maxY) {
+        if (!EmojiTriggerManager.intersectView(this, (int)x, (int)y)) {
             //out of the emoji zone
             for (int i = 0; i < config.emojis.size(); i++)
                 setUnselectedEmoji(i);
@@ -271,12 +346,58 @@ public class EmojiLikeView extends RelativeLayout {
             selectedEmoji = index;
             EmojiCellView view = emojiCellViews.get(selectedEmoji);
             float weight = getWeight(view);
-            growView(view, index, weight, 4, config.emojiAnimationSpeed, true);
+            growView(view, index, view.getScaleX(), 2, 21, 55, config.emojiAnimationSpeed, true);
         }
     }
 
 
-    private void growView(EmojiCellView view, int index, float initWeight, float maxWeight, float step, boolean shouldSelect) {
+    private void growView(EmojiCellView view, int index, float initWeight, float maxWeight, int bottommargin, int imageWidth, float step, boolean shouldSelect) {
+        ValueAnimator animator = ValueAnimator.ofInt(0,1000);
+        animator.setDuration(100);
+
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+        final int viewBottommargin = params.bottomMargin;
+
+        ImageView imageView= view.findViewById(R.id.imageView);
+        LinearLayout.LayoutParams imageViewParams = (LinearLayout.LayoutParams) imageView.getLayoutParams();
+        final int imageViewWidth = imageViewParams.width;
+
+       params.bottomMargin = dpToPx(bottommargin);
+        view.setLayoutParams(params);
+        int size = dpToPx(imageWidth);
+        imageViewParams.width = size;
+        imageViewParams.height = size;
+
+        /*animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int fraction = (int) animation.getAnimatedValue();
+                Log.e("yhf", fraction + "");
+
+               // float scale = (float)initWeight + ((float)(fraction * (maxWeight - initWeight)));
+               // view.setScaleX(scale);
+              //  view.setScaleY(scale);
+
+                params.bottomMargin = viewBottommargin + (int)(fraction * (dpToPx(bottommargin) - viewBottommargin) / 1000);
+                view.setLayoutParams(params);
+
+                //int size = imageViewWidth + ((int)(fraction * (dpToPx(imageWidth) - imageViewWidth) / 1000));
+                //imageViewParams.width = size;
+               // imageViewParams.height = size;
+
+
+                // view.requestLayout();
+              //  view.invalidate();
+               // emojiCellsContainer.requestLayout();
+             //   emojiCellsContainer.invalidate();
+
+            }
+        });
+
+        animator.start();*/
+    }
+
+    private void growView1(EmojiCellView view, int index, float initWeight, float maxWeight, float step, boolean shouldSelect) {
         Animation a = new ViewWeightAnimation(view, index, initWeight, maxWeight, step, shouldSelect, config);
         view.startAnimation(a);
     }
@@ -288,12 +409,12 @@ public class EmojiLikeView extends RelativeLayout {
         if (index >= 0 && index < emojiCellViews.size()) {
             EmojiCellView view = emojiCellViews.get(index);
             float weight = getWeight(view);
-            shrinkView(view, index, weight, 1f, -config.emojiAnimationSpeed, false);
+            shrinkView(view, index, view.getScaleX(), 1f, -config.emojiAnimationSpeed, false);
         }
     }
 
     private void shrinkView(EmojiCellView view, int index, float initWeight, float maxWeight, float step, boolean forSelected) {
-        growView(view, index, initWeight, maxWeight, step, forSelected);
+        growView(view, index, initWeight, maxWeight, 8, 36, step, forSelected);
     }
 
 
@@ -306,5 +427,11 @@ public class EmojiLikeView extends RelativeLayout {
 
     public boolean isShowed() {
         return this.emojiCellsContainer.getVisibility() == View.VISIBLE;
+    }
+
+    public int dpToPx(int i) {
+        Resources r = getContext().getResources();
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, i, r.getDisplayMetrics());
+        return (int) px;
     }
 }

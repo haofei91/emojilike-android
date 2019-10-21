@@ -59,12 +59,11 @@ public class ViewWeightAnimation extends Animation {
             int left = shouldSelect ? config.selectedEmojiMarginLeft : config.unselectedEmojiMarginLeft;
             int top = shouldSelect ? config.selectedEmojiMarginTop : config.unselectedEmojiMarginTop;
             int bottom = shouldSelect ? config.selectedEmojiMarginBottom : config.unselectedEmojiMarginBottom;
-            int right = shouldSelect ? config.selectedEmojiMarginRight : config.unselectedEmojiMarginRight;
             if (index == 0)
-                params.setMargins(config.emojiViewMarginLeft + left, top, right, bottom);
+                params.setMargins(config.emojiImagesContainerPaddingLeft, top, left, bottom);
             else if (index == config.emojis.size() - 1)
-                params.setMargins(left, top, right + config.emojiViewMarginRight, bottom);
-            else params.setMargins(left, top, right, bottom);
+                params.setMargins(0, top, config.emojiImagesContainerPaddingRight, bottom);
+            else params.setMargins(0, top, left, bottom);
 
             view.setLayoutParams(params);
 

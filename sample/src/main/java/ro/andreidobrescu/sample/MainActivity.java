@@ -20,8 +20,7 @@ import ro.andreidobrescu.emojilike.listener.OnEmojiSelectedListener;
 import ro.andreidobrescu.sample.fragments.FragmentActivitySample;
 import ro.andreidobrescu.sample.recycler.RecyclerActivitySample;
 
-public class MainActivity extends AppCompatActivity implements OnEmojiSelectedListener, IActivityWithEmoji
-{
+public class MainActivity extends AppCompatActivity implements OnEmojiSelectedListener {
     EmojiLikeTouchDetector emojiLikeTouchDetector;
 
     @BindView(R.id.likeButton)
@@ -43,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements OnEmojiSelectedLi
 
         EmojiConfig.with(this)
                 .on(likeButton)
-                //.open(emojiView)
                 .addEmoji(new EmojiEntity(R.drawable.like, "Like"))
                 .addEmoji(new EmojiEntity(R.drawable.haha, "Haha"))
                 .addEmoji(new EmojiEntity(R.drawable.kiss, "Kiss"))
@@ -75,19 +73,5 @@ public class MainActivity extends AppCompatActivity implements OnEmojiSelectedLi
         startActivity(i);
     }
 
-    //override these 2 methods if your activity doesn't extend ActivityWithEmoji
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event)
-    {
-        boolean shouldCallSuper=emojiLikeTouchDetector.dispatchTouchEvent(event);
-        if (shouldCallSuper)
-            return super.dispatchTouchEvent(event);
-        return false;
-    }
 
-    @Override
-    public void configureEmojiLike(EmojiConfig config)
-    {
-        emojiLikeTouchDetector.configure(config);
-    }
 }
